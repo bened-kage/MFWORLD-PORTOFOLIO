@@ -157,6 +157,169 @@ export default function Admin() {
     },
   });
 
+  // Experience form
+  const experienceForm = useForm({
+    resolver: zodResolver(insertExperienceSchema),
+    defaultValues: {
+      position: "",
+      company: "",
+      duration: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+    },
+  });
+
+  const experienceMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/experiences", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Experience added successfully!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/experiences"] });
+      experienceForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Failed to add experience", variant: "destructive" });
+    },
+  });
+
+  const deleteExperienceMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/experiences/${id}`);
+    },
+    onSuccess: () => {
+      toast({ title: "Experience deleted successfully!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/experiences"] });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete experience", variant: "destructive" });
+    },
+  });
+
+  // Education form
+  const educationForm = useForm({
+    resolver: zodResolver(insertEducationSchema),
+    defaultValues: {
+      degree: "",
+      institution: "",
+      year: "",
+      description: "",
+    },
+  });
+
+  const educationMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/education", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Education added successfully!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/education"] });
+      educationForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Failed to add education", variant: "destructive" });
+    },
+  });
+
+  const deleteEducationMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/education/${id}`);
+    },
+    onSuccess: () => {
+      toast({ title: "Education deleted successfully!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/education"] });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete education", variant: "destructive" });
+    },
+  });
+
+  // Activities form
+  const activityForm = useForm({
+    resolver: zodResolver(insertActivitySchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      icon: "",
+      category: "",
+    },
+  });
+
+  const activityMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/activities", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Activity added successfully!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/activities"] });
+      activityForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Failed to add activity", variant: "destructive" });
+    },
+  });
+
+  const deleteActivityMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/activities/${id}`);
+    },
+    onSuccess: () => {
+      toast({ title: "Activity deleted successfully!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/activities"] });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete activity", variant: "destructive" });
+    },
+  });
+
+  // Articles form
+  const articleForm = useForm({
+    resolver: zodResolver(insertArticleSchema),
+    defaultValues: {
+      title: "",
+      excerpt: "",
+      content: "",
+      category: "",
+      image: "",
+      date: "",
+      published: true,
+    },
+  });
+
+  const articleMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/articles", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Article added successfully!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/articles/all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      articleForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Failed to add article", variant: "destructive" });
+    },
+  });
+
+  const deleteArticleMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/articles/${id}`);
+    },
+    onSuccess: () => {
+      toast({ title: "Article deleted successfully!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/articles/all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+    },
+    onError: () => {
+      toast({ title: "Failed to delete article", variant: "destructive" });
+    },
+  });
+
   // Contact message mutations
   const markAsReadMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -402,6 +565,430 @@ export default function Admin() {
                 className="md:col-span-2 lg:col-span-5 bg-gradient-to-r from-neon-cyan to-neon-green text-slate-900 font-semibold"
               >
                 {skillMutation.isPending ? "Adding..." : "Add Skill"}
+                <Plus className="ml-2 h-4 w-4" />
+              </Button>
+            </form>
+          </GlassCard>
+        )}
+
+        {/* Experience Section */}
+        {activeSection === "experience" && (
+          <GlassCard>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-neon-cyan">Manage Experience</h3>
+            </div>
+            
+            {/* Experience List */}
+            <div className="space-y-4 mb-8">
+              {experiences.map((exp) => (
+                <div key={exp.id} className="bg-slate-800 rounded-lg p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h5 className="font-semibold text-lg text-neon-cyan">{exp.position}</h5>
+                      <p className="text-white">{exp.company}</p>
+                      <p className="text-sm text-slate-400">{exp.duration}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => deleteExperienceMutation.mutate(exp.id)}
+                      disabled={deleteExperienceMutation.isPending}
+                      className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-slate-300">{exp.description}</p>
+                </div>
+              ))}
+            </div>
+            
+            {/* Add Experience Form */}
+            <form
+              onSubmit={experienceForm.handleSubmit((data) => experienceMutation.mutate(data))}
+              className="grid md:grid-cols-2 gap-6"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="position">Position</Label>
+                <Input
+                  id="position"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...experienceForm.register("position")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="company">Company</Label>
+                <Input
+                  id="company"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...experienceForm.register("company")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="duration">Duration</Label>
+                <Input
+                  id="duration"
+                  placeholder="e.g., Jan 2020 - Dec 2022"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...experienceForm.register("duration")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Start Date</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...experienceForm.register("startDate")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="endDate">End Date (Optional)</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...experienceForm.register("endDate")}
+                />
+              </div>
+              
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="expDescription">Description</Label>
+                <Textarea
+                  id="expDescription"
+                  rows={3}
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                  {...experienceForm.register("description")}
+                />
+              </div>
+              
+              <Button
+                type="submit"
+                disabled={experienceMutation.isPending}
+                className="md:col-span-2 bg-gradient-to-r from-neon-cyan to-neon-green text-slate-900 font-semibold"
+              >
+                {experienceMutation.isPending ? "Adding..." : "Add Experience"}
+                <Plus className="ml-2 h-4 w-4" />
+              </Button>
+            </form>
+          </GlassCard>
+        )}
+
+        {/* Education Section */}
+        {activeSection === "education" && (
+          <GlassCard>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-neon-cyan">Manage Education</h3>
+            </div>
+            
+            {/* Education List */}
+            <div className="space-y-4 mb-8">
+              {education.map((edu) => (
+                <div key={edu.id} className="bg-slate-800 rounded-lg p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h5 className="font-semibold text-lg text-neon-cyan">{edu.degree}</h5>
+                      <p className="text-white">{edu.institution}</p>
+                      <p className="text-sm text-slate-400">{edu.year}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => deleteEducationMutation.mutate(edu.id)}
+                      disabled={deleteEducationMutation.isPending}
+                      className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {edu.description && (
+                    <p className="text-slate-300">{edu.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            {/* Add Education Form */}
+            <form
+              onSubmit={educationForm.handleSubmit((data) => educationMutation.mutate(data))}
+              className="grid md:grid-cols-2 gap-6"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="degree">Degree</Label>
+                <Input
+                  id="degree"
+                  placeholder="e.g., Bachelor of Computer Science"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...educationForm.register("degree")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="institution">Institution</Label>
+                <Input
+                  id="institution"
+                  placeholder="e.g., University of Technology"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...educationForm.register("institution")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="year">Year</Label>
+                <Input
+                  id="year"
+                  placeholder="e.g., 2018 - 2022"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...educationForm.register("year")}
+                />
+              </div>
+              
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="eduDescription">Description (Optional)</Label>
+                <Textarea
+                  id="eduDescription"
+                  rows={3}
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                  {...educationForm.register("description")}
+                />
+              </div>
+              
+              <Button
+                type="submit"
+                disabled={educationMutation.isPending}
+                className="md:col-span-2 bg-gradient-to-r from-neon-cyan to-neon-green text-slate-900 font-semibold"
+              >
+                {educationMutation.isPending ? "Adding..." : "Add Education"}
+                <Plus className="ml-2 h-4 w-4" />
+              </Button>
+            </form>
+          </GlassCard>
+        )}
+
+        {/* Activities Section */}
+        {activeSection === "activities" && (
+          <GlassCard>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-neon-cyan">Manage Activities</h3>
+            </div>
+            
+            {/* Activities List */}
+            <div className="space-y-4 mb-8">
+              {activities.map((activity) => (
+                <div key={activity.id} className="bg-slate-800 rounded-lg p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center">
+                      <i className={`${activity.icon} text-2xl text-neon-cyan mr-4`}></i>
+                      <div>
+                        <h5 className="font-semibold text-lg">{activity.title}</h5>
+                        <p className="text-sm text-slate-400">{activity.category}</p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => deleteActivityMutation.mutate(activity.id)}
+                      disabled={deleteActivityMutation.isPending}
+                      className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-slate-300">{activity.description}</p>
+                </div>
+              ))}
+            </div>
+            
+            {/* Add Activity Form */}
+            <form
+              onSubmit={activityForm.handleSubmit((data) => activityMutation.mutate(data))}
+              className="grid md:grid-cols-2 gap-6"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="activityTitle">Title</Label>
+                <Input
+                  id="activityTitle"
+                  placeholder="e.g., Open Source Contributor"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...activityForm.register("title")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="activityCategory">Category</Label>
+                <Input
+                  id="activityCategory"
+                  placeholder="e.g., Development"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...activityForm.register("category")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="activityIcon">Icon Class</Label>
+                <Input
+                  id="activityIcon"
+                  placeholder="e.g., fas fa-code"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...activityForm.register("icon")}
+                />
+              </div>
+              
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="activityDescription">Description</Label>
+                <Textarea
+                  id="activityDescription"
+                  rows={3}
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                  {...activityForm.register("description")}
+                />
+              </div>
+              
+              <Button
+                type="submit"
+                disabled={activityMutation.isPending}
+                className="md:col-span-2 bg-gradient-to-r from-neon-cyan to-neon-green text-slate-900 font-semibold"
+              >
+                {activityMutation.isPending ? "Adding..." : "Add Activity"}
+                <Plus className="ml-2 h-4 w-4" />
+              </Button>
+            </form>
+          </GlassCard>
+        )}
+
+        {/* Articles Section */}
+        {activeSection === "articles" && (
+          <GlassCard>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-neon-cyan">Manage Articles</h3>
+            </div>
+            
+            {/* Articles List */}
+            <div className="space-y-4 mb-8">
+              {articles.map((article) => (
+                <div key={article.id} className="bg-slate-800 rounded-lg p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex">
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        className="w-16 h-16 object-cover rounded mr-4"
+                      />
+                      <div>
+                        <h5 className="font-semibold text-lg text-neon-cyan">{article.title}</h5>
+                        <p className="text-sm text-slate-400">{article.category} • {article.date}</p>
+                        <p className="text-sm text-slate-500 mt-1">{article.excerpt}</p>
+                        <span className={`text-xs px-2 py-1 rounded ${article.published ? 'bg-green-600' : 'bg-red-600'} mt-2 inline-block`}>
+                          {article.published ? 'Published' : 'Draft'}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => deleteArticleMutation.mutate(article.id)}
+                      disabled={deleteArticleMutation.isPending}
+                      className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Add Article Form */}
+            <form
+              onSubmit={articleForm.handleSubmit((data) => {
+                // Set current date if not provided
+                if (!data.date) {
+                  data.date = new Date().toLocaleDateString();
+                }
+                articleMutation.mutate(data);
+              })}
+              className="grid md:grid-cols-2 gap-6"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="articleTitle">Title</Label>
+                <Input
+                  id="articleTitle"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...articleForm.register("title")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="articleCategory">Category</Label>
+                <Input
+                  id="articleCategory"
+                  placeholder="e.g., Web Development"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...articleForm.register("category")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="articleImage">Image URL</Label>
+                <Input
+                  id="articleImage"
+                  placeholder="https://example.com/image.jpg"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...articleForm.register("image")}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="articleDate">Date</Label>
+                <Input
+                  id="articleDate"
+                  type="date"
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan"
+                  {...articleForm.register("date")}
+                />
+              </div>
+              
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="articleExcerpt">Excerpt</Label>
+                <Textarea
+                  id="articleExcerpt"
+                  rows={2}
+                  placeholder="Brief description of the article..."
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                  {...articleForm.register("excerpt")}
+                />
+              </div>
+              
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="articleContent">Content</Label>
+                <Textarea
+                  id="articleContent"
+                  rows={6}
+                  placeholder="Full article content..."
+                  className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                  {...articleForm.register("content")}
+                />
+              </div>
+              
+              <div className="flex items-center space-x-2 md:col-span-2">
+                <input
+                  type="checkbox"
+                  id="published"
+                  className="w-4 h-4 text-neon-cyan bg-gray-100 border-gray-300 rounded focus:ring-neon-cyan"
+                  {...articleForm.register("published")}
+                />
+                <Label htmlFor="published">Publish immediately</Label>
+              </div>
+              
+              <Button
+                type="submit"
+                disabled={articleMutation.isPending}
+                className="md:col-span-2 bg-gradient-to-r from-neon-cyan to-neon-green text-slate-900 font-semibold"
+              >
+                {articleMutation.isPending ? "Adding..." : "Add Article"}
                 <Plus className="ml-2 h-4 w-4" />
               </Button>
             </form>

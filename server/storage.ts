@@ -106,27 +106,101 @@ export class MemStorage implements IStorage {
     // Initialize default biodata
     this.biodata.set(1, {
       id: 1,
-      name: "Portfolio Owner",
+      name: "John Developer",
       title: "Full Stack Developer",
-      bio: "Passionate developer creating modern web applications with cutting-edge technologies.",
-      email: "contact@portfolio.com",
-      phone: "+1 (555) 123-4567",
-      location: "San Francisco, CA",
+      bio: "Passionate developer creating modern web applications with cutting-edge technologies. Experienced in React, Node.js, and cloud solutions.",
+      email: "john@portfolio.com",
+      phone: "+62 812-3456-7890",
+      location: "Jakarta, Indonesia",
       profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300"
     });
 
+    // Initialize sample skills
+    this.skills.set(1, { id: 1, name: "JavaScript", level: "Expert", percentage: 95, icon: "fab fa-js-square", category: "Frontend" });
+    this.skills.set(2, { id: 2, name: "React", level: "Advanced", percentage: 90, icon: "fab fa-react", category: "Frontend" });
+    this.skills.set(3, { id: 3, name: "Node.js", level: "Advanced", percentage: 85, icon: "fab fa-node-js", category: "Backend" });
+    this.skills.set(4, { id: 4, name: "TypeScript", level: "Advanced", percentage: 88, icon: "fab fa-js-square", category: "Programming" });
+    this.skills.set(5, { id: 5, name: "Python", level: "Intermediate", percentage: 75, icon: "fab fa-python", category: "Backend" });
+
+    // Initialize sample experiences
+    this.experiences.set(1, {
+      id: 1,
+      position: "Senior Full Stack Developer",
+      company: "TechCorp Indonesia",
+      duration: "Jan 2022 - Present",
+      description: "Leading development of modern web applications using React, Node.js, and cloud technologies. Managed a team of 5 developers and improved application performance by 40%.",
+      startDate: "2022-01-01",
+      endDate: null
+    });
+    this.experiences.set(2, {
+      id: 2,
+      position: "Frontend Developer",
+      company: "StartupXYZ",
+      duration: "Jun 2020 - Dec 2021",
+      description: "Developed responsive user interfaces using React and TypeScript. Collaborated with design team to implement modern UI/UX solutions.",
+      startDate: "2020-06-01",
+      endDate: "2021-12-31"
+    });
+
+    // Initialize sample education
+    this.education.set(1, {
+      id: 1,
+      degree: "Bachelor of Computer Science",
+      institution: "Universitas Indonesia",
+      year: "2016 - 2020",
+      description: "Graduated Cum Laude with focus on Software Engineering and Web Development."
+    });
+
+    // Initialize sample activities
+    this.activities.set(1, {
+      id: 1,
+      title: "Open Source Contributor",
+      description: "Active contributor to various open source projects on GitHub, focusing on React and Node.js libraries.",
+      icon: "fab fa-github",
+      category: "Development"
+    });
+    this.activities.set(2, {
+      id: 2,
+      title: "Tech Community Speaker",
+      description: "Regular speaker at tech meetups and conferences about modern web development.",
+      icon: "fas fa-microphone",
+      category: "Community"
+    });
+
+    // Initialize sample articles
+    this.articles.set(1, {
+      id: 1,
+      title: "Building Modern React Applications",
+      excerpt: "Learn how to build scalable and maintainable React applications using modern best practices.",
+      content: "React has evolved significantly over the years. In this article, we'll explore the latest patterns and practices for building modern React applications...",
+      category: "Web Development",
+      image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400",
+      date: "2024-01-15",
+      published: true
+    });
+    this.articles.set(2, {
+      id: 2,
+      title: "Node.js Performance Optimization",
+      excerpt: "Tips and techniques to optimize your Node.js applications for better performance.",
+      content: "Performance is crucial for any web application. Here are some proven techniques to optimize your Node.js applications...",
+      category: "Backend Development",
+      image: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400",
+      date: "2024-01-10",
+      published: true
+    });
+
     // Initialize default social links
-    this.socialLinks.set(1, { id: 1, platform: "GitHub", url: "https://github.com", icon: "fab fa-github" });
-    this.socialLinks.set(2, { id: 2, platform: "LinkedIn", url: "https://linkedin.com", icon: "fab fa-linkedin" });
-    this.socialLinks.set(3, { id: 3, platform: "Twitter", url: "https://twitter.com", icon: "fab fa-twitter" });
+    this.socialLinks.set(1, { id: 1, platform: "GitHub", url: "https://github.com/johndeveloper", icon: "fab fa-github" });
+    this.socialLinks.set(2, { id: 2, platform: "LinkedIn", url: "https://linkedin.com/in/johndeveloper", icon: "fab fa-linkedin" });
+    this.socialLinks.set(3, { id: 3, platform: "Twitter", url: "https://twitter.com/johndeveloper", icon: "fab fa-twitter" });
 
     // Initialize default services
-    this.services.set(1, { id: 1, name: "Website Development", price: "$2,500+", description: "Custom website development" });
-    this.services.set(2, { id: 2, name: "Web Application", price: "$5,000+", description: "Full-stack web applications" });
-    this.services.set(3, { id: 3, name: "UI/UX Design", price: "$1,500+", description: "Modern UI/UX design services" });
-    this.services.set(4, { id: 4, name: "Consultation", price: "$150/hour", description: "Technical consultation" });
+    this.services.set(1, { id: 1, name: "Website Development", price: "Rp 25.000.000+", description: "Custom website development with modern technologies" });
+    this.services.set(2, { id: 2, name: "Web Application", price: "Rp 50.000.000+", description: "Full-stack web applications with database integration" });
+    this.services.set(3, { id: 3, name: "UI/UX Design", price: "Rp 15.000.000+", description: "Modern UI/UX design services" });
+    this.services.set(4, { id: 4, name: "Consultation", price: "Rp 500.000/jam", description: "Technical consultation and code review" });
 
-    this.currentId = 10;
+    this.currentId = 20;
   }
 
   // User methods
