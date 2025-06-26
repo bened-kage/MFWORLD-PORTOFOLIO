@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(199, 89%, 48%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+
+  /* Custom portfolio colors */
+  --dark-navy: hsl(240, 23%, 9%);
+  --deep-purple: hsl(240, 31%, 14%);
+  --medium-blue: hsl(215, 42%, 16%);
+  --neon-cyan: hsl(189, 100%, 50%);
+  --neon-green: hsl(154, 100%, 50%);
+  --gold: hsl(43, 100%, 50%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased text-foreground;
+    background: linear-gradient(135deg, hsl(240, 23%, 9%) 0%, hsl(240, 31%, 14%) 50%, hsl(215, 42%, 16%) 100%);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+  }
+  
+  .gradient-text {
+    background: linear-gradient(45deg, hsl(189, 100%, 50%), hsl(154, 100%, 50%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .skill-bar {
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .skill-progress {
+    background: linear-gradient(90deg, hsl(189, 100%, 50%), hsl(154, 100%, 50%));
+    height: 100%;
+    transition: width 2s ease-in-out;
+  }
+
+  .floating-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .glow-animation {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .slide-up-animation {
+    animation: slideUp 0.5s ease-out;
+  }
+
+  .neon-cyan {
+    color: hsl(189, 100%, 50%);
+  }
+
+  .neon-green {
+    color: hsl(154, 100%, 50%);
+  }
+
+  .text-neon-cyan {
+    color: hsl(189, 100%, 50%);
+  }
+
+  .text-neon-green {
+    color: hsl(154, 100%, 50%);
+  }
+
+  .bg-neon-cyan {
+    background-color: hsl(189, 100%, 50%);
+  }
+
+  .bg-neon-green {
+    background-color: hsl(154, 100%, 50%);
+  }
+
+  .border-neon-cyan {
+    border-color: hsl(189, 100%, 50%);
+  }
+
+  .hover\:text-neon-cyan:hover {
+    color: hsl(189, 100%, 50%);
+  }
+
+  .hover\:text-neon-green:hover {
+    color: hsl(154, 100%, 50%);
+  }
+
+  .focus\:border-neon-cyan:focus {
+    border-color: hsl(189, 100%, 50%);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 20px hsl(189, 100%, 50%); }
+  to { box-shadow: 0 0 30px hsl(189, 100%, 50%), 0 0 40px hsl(189, 100%, 50%); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(240, 23%, 9%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(189, 100%, 50%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(154, 100%, 50%);
+}
