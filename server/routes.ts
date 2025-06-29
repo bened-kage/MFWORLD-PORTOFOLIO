@@ -6,7 +6,7 @@ import {
   insertBiodataSchema, insertSkillSchema, insertExperienceSchema, insertEducationSchema,
   insertActivitySchema, insertArticleSchema, insertContactMessageSchema, insertSocialLinkSchema,
   insertServiceSchema, insertProjectSchema
-} from "@shared/schema";
+} from "../shared/schema.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Simple session middleware for admin authentication
