@@ -44,6 +44,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/", (req, res) => {
+  res.send("PortfolioTracker API is running!");
+});
+
 (async () => {
   const server = await registerRoutes(app);
 
