@@ -5,13 +5,30 @@ import { eq } from "drizzle-orm";
 import * as schema from "../shared/schema.js";
 
 const connectionString = process.env.DATABASE_URL || "postgresql://localhost:5432/portfolio";
+
+console.log("Database connection string:", connectionString ? "Set" : "Not set");
+
 const client = postgres(connectionString, {
   connect_timeout: 30,
   idle_timeout: 20,
   max_lifetime: 60 * 30,
+  onnotice: (notice) => console.log("Database notice:", notice),
+  onparameter: (param) => console.log("Database parameter:", param),
 });
 
 export const drizzleDb = drizzle(client, { schema });
+
+// Test database connection
+export async function testConnection() {
+  try {
+    await client`SELECT 1`;
+    console.log("Database connection successful");
+    return true;
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    return false;
+  }
+}
 
 // USER CRUD
 export async function getUser(id: number) {

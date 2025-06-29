@@ -29,54 +29,86 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (requestPath.startsWith("/api")) {
-      let logLine = `${req.method} ${requestPath} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
+    let logLine = `${req.method} ${requestPath} ${res.statusCode} in ${duration}ms`;
+    if (capturedJsonResponse) {
+      logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+    }
 
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
+    if (logLine.length > 80) {
+      logLine = logLine.slice(0, 79) + "…";
+    }
 
-      log(logLine);
+    // Log all requests, not just API requests
+    log(logLine);
+    
+    // Log 500 errors with more detail
+    if (res.statusCode === 500) {
+      console.error(`500 Error for ${req.method} ${requestPath}`);
+      console.error(`User Agent: ${req.get('User-Agent')}`);
+      console.error(`Referer: ${req.get('Referer')}`);
     }
   });
 
   next();
 });
 
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// API status endpoint at a different path
+app.get("/api/status", (req, res) => {
   res.send("PortfolioTracker API is running!");
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    // Global error handler - must be after all routes
+    app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
+      console.error("Global error handler caught:", err);
+      console.error("Request URL:", req.url);
+      console.error("Request method:", req.method);
+      console.error("Request headers:", req.headers);
+      console.error("Error stack:", err.stack);
+      
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
-  });
+      res.status(status).json({ 
+        message,
+        error: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+        timestamp: new Date().toISOString()
+      });
+    });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    // importantly only setup vite in development and after
+    // setting up all the other routes so the catch-all route
+    // doesn't interfere with the other routes
+    if (app.get("env") === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
+
+    // Use PORT from environment variable for Railway deployment
+    const port = process.env.PORT || 5000;
+    server.listen({
+      port,
+      host: "0.0.0.0", // Listen on all available network interfaces
+
+    }, () => {
+      log(`serving on port ${port}`);
+    });
+
+    // Handle server errors
+    server.on('error', (error) => {
+      console.error('Server error:', error);
+    });
+
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
   }
-
-  // Use PORT from environment variable for Railway deployment
-  const port = process.env.PORT || 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0", // Listen on all available network interfaces
-
-  }, () => {
-    log(`serving on port ${port}`);
-  });
 })();

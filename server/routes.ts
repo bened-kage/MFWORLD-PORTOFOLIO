@@ -52,7 +52,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const biodata = await storage.getBiodata();
       res.json(biodata);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch biodata" });
+      console.error("Error fetching biodata:", error);
+      res.status(500).json({ message: "Failed to fetch biodata", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -62,7 +63,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const biodata = await storage.updateBiodata(validatedData);
       res.json(biodata);
     } catch (error) {
-      res.status(400).json({ message: "Invalid biodata data" });
+      console.error("Error updating biodata:", error);
+      res.status(400).json({ message: "Invalid biodata data", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
@@ -72,7 +74,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const skills = await storage.getSkills();
       res.json(skills);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch skills" });
+      console.error("Error fetching skills:", error);
+      res.status(500).json({ message: "Failed to fetch skills", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
