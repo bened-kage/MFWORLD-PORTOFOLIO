@@ -74,14 +74,22 @@ export async function setupVite(app: Express, server: Server) {
 export function serveStatic(app: Express) {
   // The built client files are in dist/public relative to project root
   const distPath = path.resolve(__dirname, "..", "dist", "public");
+  console.log("serveStatic: distPath =", distPath);
 
   if (!fs.existsSync(distPath)) {
     console.error(`Build directory not found: ${distPath}`);
     console.error(`Current directory: ${__dirname}`);
-    console.error(`Available files in dist:`, fs.existsSync(path.resolve(__dirname, "..", "dist")) ? fs.readdirSync(path.resolve(__dirname, "..", "dist")) : "dist directory not found");
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+    console.error(
+      `Available files in dist:`,
+      fs.existsSync(path.resolve(__dirname, "..", "dist"))
+        ? fs.readdirSync(path.resolve(__dirname, "..", "dist"))
+        : "dist directory not found"
     );
+    // Fallback: jangan throw error, tapi kirim response 500
+    app.use("*", (_req, res) => {
+      res.status(500).send("Build directory not found on server.");
+    });
+    return;
   }
 
   app.use(express.static(distPath));
@@ -89,6 +97,7 @@ export function serveStatic(app: Express) {
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
     const indexPath = path.resolve(distPath, "index.html");
+    console.log("serveStatic: indexPath =", indexPath);
     if (!fs.existsSync(indexPath)) {
       console.error(`Index.html not found at: ${indexPath}`);
       return res.status(404).send("Not found");

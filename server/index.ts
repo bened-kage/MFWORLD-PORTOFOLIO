@@ -12,7 +12,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Serve uploaded files statically
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+const uploadsPath = path.join(__dirname, "../uploads");
+console.log("uploadsPath =", uploadsPath);
+app.use("/uploads", express.static(uploadsPath));
 
 app.use((req, res, next) => {
   const start = Date.now();
