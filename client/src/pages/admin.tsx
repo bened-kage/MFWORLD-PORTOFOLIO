@@ -765,6 +765,16 @@ export default function Admin() {
     { id: "social-links", label: "Social Links" },
   ];
 
+  function resetEditStates() {
+    setEditSkill(null);
+    setEditExperience(null);
+    setEditEducation(null);
+    setEditActivity(null);
+    setEditArticle(null);
+    setEditProject(null);
+    setEditSocialLink(null);
+  }
+
   return (
     <div className="min-h-screen pt-20 py-8 relative overflow-hidden">
       <ParticleBackground />
@@ -923,11 +933,7 @@ export default function Admin() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => {
-                        console.log("Edit skill clicked", skill);
-                        setEditSkill(skill);
-                        setIsEditSkillModalOpen(true);
-                      }}
+                      onClick={() => { resetEditStates(); setEditSkill(skill); setIsEditSkillModalOpen(true); }}
                       className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
                     >
                       <Edit className="h-4 w-4" />
@@ -1035,11 +1041,7 @@ export default function Admin() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          console.log("Edit experience clicked", exp);
-                          setEditExperience(exp);
-                          setIsEditExperienceModalOpen(true);
-                        }}
+                        onClick={() => { resetEditStates(); setEditExperience(exp); setIsEditExperienceModalOpen(true); }}
                         className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
                       >
                         <Edit className="h-4 w-4" />
@@ -1180,11 +1182,7 @@ export default function Admin() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          console.log("Edit education clicked", edu);
-                          setEditEducation(edu);
-                          setIsEditEducationModalOpen(true);
-                        }}
+                        onClick={() => { resetEditStates(); setEditEducation(edu); setIsEditEducationModalOpen(true); }}
                         className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
                       >
                         <Edit className="h-4 w-4" />
@@ -1287,11 +1285,7 @@ export default function Admin() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          console.log("Edit activity clicked", activity);
-                          setEditActivity(activity);
-                          setIsEditModalOpen(true);
-                        }}
+                        onClick={() => { resetEditStates(); setEditActivity(activity); setIsEditModalOpen(true); }}
                         className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
                       >
                         <Edit className="h-4 w-4" />
@@ -1424,11 +1418,7 @@ export default function Admin() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          console.log("Edit article clicked", article);
-                          setEditArticle(article);
-                          setIsEditArticleModalOpen(true);
-                        }}
+                        onClick={() => { resetEditStates(); setEditArticle(article); setIsEditArticleModalOpen(true); }}
                         className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
                       >
                         <Edit className="h-4 w-4" />
@@ -1709,13 +1699,10 @@ export default function Admin() {
                       {project.link && <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-neon-cyan underline text-sm">{project.link}</a>}
                     </div>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => {
-                        console.log("Edit project clicked", project);
-                        setEditProject(project);
-                        setIsEditProjectModalOpen(true);
-                      }} className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"><Edit className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="outline" onClick={() => { resetEditStates(); setEditProject(project); setIsEditProjectModalOpen(true); }} className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"><Edit className="h-4 w-4" /></Button>
                       <Button size="sm" variant="outline" onClick={() => deleteProjectMutation.mutate(project.id)} disabled={deleteProjectMutation.isPending} className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"><Trash2 className="h-4 w-4" /></Button>
                     </div>
+
                   </div>
                   {project.image && <img src={project.image} alt={project.title} className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600 mb-2" />}
                   <p className="text-slate-300">{project.description}</p>
@@ -1819,11 +1806,7 @@ export default function Admin() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          console.log("Edit social link clicked", link);
-                          setEditSocialLink(link);
-                          setIsEditSocialLinkModalOpen(true);
-                        }}
+                        onClick={() => { resetEditStates(); setEditSocialLink(link); setIsEditSocialLinkModalOpen(true); }}
                         className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
                       >
                         <Edit className="h-4 w-4" />
@@ -1891,48 +1874,47 @@ export default function Admin() {
 
             {/* Edit Social Link Modal */}
             {isEditSocialLinkModalOpen && (
-              <div style={{
-                position: "fixed", left: 0, top: 0, width: "100vw", height: "100vh",
-                background: "rgba(0,0,0,0.7)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center"
-              }}>
-                <div style={{ background: "#222", color: "#fff", padding: 32, borderRadius: 8 }}>
-                  <h2>Edit Social Link</h2>
-                  <form onSubmit={editSocialLinkForm.handleSubmit((data) => updateSocialLinkMutation.mutate(data))} className="space-y-4">
-                    <div>
-                      <Label htmlFor="editPlatform">Platform</Label>
-                      <Input 
-                        id="editPlatform" 
-                        className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
-                        {...editSocialLinkForm.register("platform")} 
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="editUrl">URL</Label>
-                      <Input 
-                        id="editUrl" 
-                        className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
-                        {...editSocialLinkForm.register("url")} 
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="editIcon">Icon Class</Label>
-                      <Input 
-                        id="editIcon" 
-                        className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
-                        {...editSocialLinkForm.register("icon")} 
-                      />
-                    </div>
-                    <div className="flex justify-end gap-2 mt-4">
-                      <Button type="button" variant="outline" onClick={() => setIsEditSocialLinkModalOpen(false)}>
-                        Cancel
-                      </Button>
-                      <Button type="submit" disabled={updateSocialLinkMutation.isPending}>
-                        {updateSocialLinkMutation.isPending ? "Saving..." : "Save Changes"}
-                      </Button>
-                    </div>
-                  </form>
+              <Dialog open={isEditSocialLinkModalOpen} onOpenChange={setIsEditSocialLinkModalOpen}>
+                <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+                  <div className="bg-slate-900 rounded-xl p-8 w-full max-w-lg">
+                    <h3 className="text-xl font-bold mb-4 text-neon-cyan">Edit Social Link</h3>
+                    <form onSubmit={editSocialLinkForm.handleSubmit((data) => updateSocialLinkMutation.mutate(data))} className="space-y-4">
+                      <div>
+                        <Label htmlFor="editPlatform">Platform</Label>
+                        <Input 
+                          id="editPlatform" 
+                          className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
+                          {...editSocialLinkForm.register("platform")} 
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="editUrl">URL</Label>
+                        <Input 
+                          id="editUrl" 
+                          className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
+                          {...editSocialLinkForm.register("url")} 
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="editIcon">Icon Class</Label>
+                        <Input 
+                          id="editIcon" 
+                          className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
+                          {...editSocialLinkForm.register("icon")} 
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2 mt-4">
+                        <Button type="button" variant="outline" onClick={() => setIsEditSocialLinkModalOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button type="submit" disabled={updateSocialLinkMutation.isPending}>
+                          {updateSocialLinkMutation.isPending ? "Saving..." : "Save Changes"}
+                        </Button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
-              </div>
+              </Dialog>
             )}
           </GlassCard>
         )}
@@ -1940,3 +1922,4 @@ export default function Admin() {
     </div>
   );
 }
+

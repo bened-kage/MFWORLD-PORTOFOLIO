@@ -106,7 +106,7 @@ export function serveStatic(app: Express) {
     }
     
     try {
-      res.sendFile(indexPath);
+    res.sendFile(indexPath);
     } catch (error) {
       console.error("Error sending index.html:", error);
       res.status(500).send("Internal server error");
