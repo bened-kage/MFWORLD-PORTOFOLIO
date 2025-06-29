@@ -922,32 +922,62 @@ export default function Admin() {
             <div className="space-y-4 mb-8">
               {skills.map((skill) => (
                 <div key={skill.id} className="flex items-center justify-between bg-slate-800 rounded-lg p-4">
-                  <div className="flex items-center">
-                    <i className={`${skill.icon} text-2xl text-neon-cyan mr-4`}></i>
-                    <div>
-                      <h5 className="font-semibold">{skill.name}</h5>
-                      <p className="text-sm text-slate-400">{skill.level} - {skill.percentage}%</p>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => { resetEditStates(); setEditSkill(skill); setIsEditSkillModalOpen(true); }}
-                      className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
+                  {editSkill && editSkill.id === skill.id ? (
+                    // Inline Edit Form
+                    <form
+                      onSubmit={editSkillForm.handleSubmit((data) => updateSkillMutation.mutate(data))}
+                      className="flex-1 flex flex-col md:flex-row md:items-center gap-4"
                     >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => deleteSkillMutation.mutate(skill.id)}
-                      disabled={deleteSkillMutation.isPending}
-                      className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-5 gap-2">
+                        <Input {...editSkillForm.register("name")} placeholder="Skill Name" />
+                        <Input {...editSkillForm.register("level")} placeholder="Level" />
+                        <Input type="number" {...editSkillForm.register("percentage", { valueAsNumber: true })} placeholder="%" />
+                        <Input {...editSkillForm.register("icon")} placeholder="Icon Class" />
+                        <Input {...editSkillForm.register("category")} placeholder="Category" />
+                      </div>
+                      <div className="flex gap-2 mt-2 md:mt-0">
+                        <Button type="submit" size="sm" className="bg-green-500 text-white">Save</Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setEditSkill(null); editSkillForm.reset(); }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  ) : (
+                    // Normal View
+                    <>
+                      <div className="flex items-center">
+                        <i className={`${skill.icon} text-2xl text-neon-cyan mr-4`}></i>
+                        <div>
+                          <h5 className="font-semibold">{skill.name}</h5>
+                          <p className="text-sm text-slate-400">{skill.level} - {skill.percentage}%</p>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { resetEditStates(); setEditSkill(skill); }}
+                          className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => deleteSkillMutation.mutate(skill.id)}
+                          disabled={deleteSkillMutation.isPending}
+                          className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
