@@ -394,7 +394,10 @@ export default function Admin() {
 
   useEffect(() => {
     if (editActivity) {
-      editActivityForm.reset(editActivity);
+      editActivityForm.reset({
+        ...editActivity,
+        image: editActivity.image || undefined
+      });
     }
   }, [editActivity]);
 
@@ -465,7 +468,11 @@ export default function Admin() {
 
   useEffect(() => {
     if (editExperience) {
-      editExperienceForm.reset(editExperience);
+      editExperienceForm.reset({
+        ...editExperience,
+        endDate: editExperience.endDate || undefined,
+        image: editExperience.image || undefined
+      });
     }
   }, [editExperience]);
 
@@ -498,7 +505,10 @@ export default function Admin() {
 
   useEffect(() => {
     if (editEducation) {
-      editEducationForm.reset(editEducation);
+      editEducationForm.reset({
+        ...editEducation,
+        description: editEducation.description || undefined
+      });
     }
   }, [editEducation]);
 
@@ -533,7 +543,10 @@ export default function Admin() {
 
   useEffect(() => {
     if (editArticle) {
-      editArticleForm.reset(editArticle);
+      editArticleForm.reset({
+        ...editArticle,
+        published: editArticle.published ?? true
+      });
     }
   }, [editArticle]);
 
@@ -644,7 +657,11 @@ export default function Admin() {
 
   useEffect(() => {
     if (editProject) {
-      editProjectForm.reset(editProject);
+      editProjectForm.reset({
+        ...editProject,
+        link: editProject.link || undefined,
+        image: editProject.image || undefined
+      });
     }
   }, [editProject]);
 
