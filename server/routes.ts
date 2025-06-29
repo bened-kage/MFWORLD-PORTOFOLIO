@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import * as storage from "./storage";
-import { uploadSingle } from "./upload";
+import * as storage from "./storage.js";
+import { uploadSingle } from "./upload.js";
 import { 
   insertBiodataSchema, insertSkillSchema, insertExperienceSchema, insertEducationSchema,
   insertActivitySchema, insertArticleSchema, insertContactMessageSchema, insertSocialLinkSchema,
