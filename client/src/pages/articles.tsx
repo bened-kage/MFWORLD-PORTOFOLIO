@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import GlassCard from "@/components/glass-card";
 import { Calendar, ArrowRight } from "lucide-react";
 import type { Article } from "@shared/schema";
+import ParticleBackground from "@/components/particle-background";
 
 export default function Articles() {
   const { data: articles = [], isLoading } = useQuery<Article[]>({
@@ -10,7 +11,8 @@ export default function Articles() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-20 flex items-center justify-center">
+      <div className="min-h-screen pt-20 flex items-center justify-center relative overflow-hidden">
+        <ParticleBackground />
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-neon-cyan"></div>
           <p className="mt-4 text-slate-400">Loading articles...</p>
@@ -20,7 +22,8 @@ export default function Articles() {
   }
 
   return (
-    <div id="articles" className="min-h-screen pt-20 py-20">
+    <div id="articles" className="min-h-screen pt-20 py-20 relative overflow-hidden">
+      <ParticleBackground />
       <div className="container mx-auto px-6">
         <h2 className="text-5xl font-bold text-center mb-16 gradient-text">Articles</h2>
         

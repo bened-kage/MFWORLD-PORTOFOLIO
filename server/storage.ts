@@ -1,457 +1,254 @@
-import { 
-  users, biodata, skills, experiences, education, activities, articles, contactMessages, socialLinks, services,
-  type User, type InsertUser, type Biodata, type InsertBiodata, type Skill, type InsertSkill,
-  type Experience, type InsertExperience, type Education, type InsertEducation, type Activity, type InsertActivity,
-  type Article, type InsertArticle, type ContactMessage, type InsertContactMessage, type SocialLink, type InsertSocialLink,
-  type Service, type InsertService
-} from "@shared/schema";
+import 'dotenv/config';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { eq } from "drizzle-orm";
+import * as schema from "../shared/schema";
 
-export interface IStorage {
-  // User methods
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+const connectionString = process.env.DATABASE_URL || "postgresql://localhost:5432/portfolio";
+const client = postgres(connectionString, {
+  connect_timeout: 30,
+  idle_timeout: 20,
+  max_lifetime: 60 * 30,
+});
 
-  // Biodata methods
-  getBiodata(): Promise<Biodata | undefined>;
-  updateBiodata(data: InsertBiodata): Promise<Biodata>;
+export const drizzleDb = drizzle(client, { schema });
 
-  // Skills methods
-  getSkills(): Promise<Skill[]>;
-  getSkill(id: number): Promise<Skill | undefined>;
-  createSkill(skill: InsertSkill): Promise<Skill>;
-  updateSkill(id: number, skill: Partial<InsertSkill>): Promise<Skill>;
-  deleteSkill(id: number): Promise<boolean>;
-
-  // Experience methods
-  getExperiences(): Promise<Experience[]>;
-  getExperience(id: number): Promise<Experience | undefined>;
-  createExperience(experience: InsertExperience): Promise<Experience>;
-  updateExperience(id: number, experience: Partial<InsertExperience>): Promise<Experience>;
-  deleteExperience(id: number): Promise<boolean>;
-
-  // Education methods
-  getEducation(): Promise<Education[]>;
-  getEducationItem(id: number): Promise<Education | undefined>;
-  createEducation(education: InsertEducation): Promise<Education>;
-  updateEducation(id: number, education: Partial<InsertEducation>): Promise<Education>;
-  deleteEducation(id: number): Promise<boolean>;
-
-  // Activities methods
-  getActivities(): Promise<Activity[]>;
-  getActivity(id: number): Promise<Activity | undefined>;
-  createActivity(activity: InsertActivity): Promise<Activity>;
-  updateActivity(id: number, activity: Partial<InsertActivity>): Promise<Activity>;
-  deleteActivity(id: number): Promise<boolean>;
-
-  // Articles methods
-  getArticles(): Promise<Article[]>;
-  getPublishedArticles(): Promise<Article[]>;
-  getArticle(id: number): Promise<Article | undefined>;
-  createArticle(article: InsertArticle): Promise<Article>;
-  updateArticle(id: number, article: Partial<InsertArticle>): Promise<Article>;
-  deleteArticle(id: number): Promise<boolean>;
-
-  // Contact messages methods
-  getContactMessages(): Promise<ContactMessage[]>;
-  createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
-  markMessageAsRead(id: number): Promise<boolean>;
-  deleteContactMessage(id: number): Promise<boolean>;
-
-  // Social links methods
-  getSocialLinks(): Promise<SocialLink[]>;
-  createSocialLink(link: InsertSocialLink): Promise<SocialLink>;
-  updateSocialLink(id: number, link: Partial<InsertSocialLink>): Promise<SocialLink>;
-  deleteSocialLink(id: number): Promise<boolean>;
-
-  // Services methods
-  getServices(): Promise<Service[]>;
-  createService(service: InsertService): Promise<Service>;
-  updateService(id: number, service: Partial<InsertService>): Promise<Service>;
-  deleteService(id: number): Promise<boolean>;
+// USER CRUD
+export async function getUser(id: number) {
+  const result = await drizzleDb.select().from(schema.users).where(eq(schema.users.id, id));
+  return result[0];
+}
+export async function getUserByUsername(username: string) {
+  const result = await drizzleDb.select().from(schema.users).where(eq(schema.users.username, username));
+  return result[0];
+}
+export async function createUser(user: schema.InsertUser) {
+  const result = await drizzleDb.insert(schema.users).values(user).returning();
+  return result[0];
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private biodata: Map<number, Biodata>;
-  private skills: Map<number, Skill>;
-  private experiences: Map<number, Experience>;
-  private education: Map<number, Education>;
-  private activities: Map<number, Activity>;
-  private articles: Map<number, Article>;
-  private contactMessages: Map<number, ContactMessage>;
-  private socialLinks: Map<number, SocialLink>;
-  private services: Map<number, Service>;
-  private currentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.biodata = new Map();
-    this.skills = new Map();
-    this.experiences = new Map();
-    this.education = new Map();
-    this.activities = new Map();
-    this.articles = new Map();
-    this.contactMessages = new Map();
-    this.socialLinks = new Map();
-    this.services = new Map();
-    this.currentId = 1;
-    this.initializeData();
-  }
-
-  private initializeData() {
-    // Initialize default admin user
-    this.users.set(1, { id: 1, username: "admin", password: "admin123" });
-    
-    // Initialize default biodata
-    this.biodata.set(1, {
-      id: 1,
-      name: "John Developer",
-      title: "Full Stack Developer",
-      bio: "Passionate developer creating modern web applications with cutting-edge technologies. Experienced in React, Node.js, and cloud solutions.",
-      email: "john@portfolio.com",
-      phone: "+62 812-3456-7890",
-      location: "Jakarta, Indonesia",
-      profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300"
-    });
-
-    // Initialize sample skills
-    this.skills.set(1, { id: 1, name: "JavaScript", level: "Expert", percentage: 95, icon: "fab fa-js-square", category: "Frontend" });
-    this.skills.set(2, { id: 2, name: "React", level: "Advanced", percentage: 90, icon: "fab fa-react", category: "Frontend" });
-    this.skills.set(3, { id: 3, name: "Node.js", level: "Advanced", percentage: 85, icon: "fab fa-node-js", category: "Backend" });
-    this.skills.set(4, { id: 4, name: "TypeScript", level: "Advanced", percentage: 88, icon: "fab fa-js-square", category: "Programming" });
-    this.skills.set(5, { id: 5, name: "Python", level: "Intermediate", percentage: 75, icon: "fab fa-python", category: "Backend" });
-
-    // Initialize sample experiences
-    this.experiences.set(1, {
-      id: 1,
-      position: "Senior Full Stack Developer",
-      company: "TechCorp Indonesia",
-      duration: "Jan 2022 - Present",
-      description: "Leading development of modern web applications using React, Node.js, and cloud technologies. Managed a team of 5 developers and improved application performance by 40%.",
-      startDate: "2022-01-01",
-      endDate: null
-    });
-    this.experiences.set(2, {
-      id: 2,
-      position: "Frontend Developer",
-      company: "StartupXYZ",
-      duration: "Jun 2020 - Dec 2021",
-      description: "Developed responsive user interfaces using React and TypeScript. Collaborated with design team to implement modern UI/UX solutions.",
-      startDate: "2020-06-01",
-      endDate: "2021-12-31"
-    });
-
-    // Initialize sample education
-    this.education.set(1, {
-      id: 1,
-      degree: "Bachelor of Computer Science",
-      institution: "Universitas Indonesia",
-      year: "2016 - 2020",
-      description: "Graduated Cum Laude with focus on Software Engineering and Web Development."
-    });
-
-    // Initialize sample activities
-    this.activities.set(1, {
-      id: 1,
-      title: "Open Source Contributor",
-      description: "Active contributor to various open source projects on GitHub, focusing on React and Node.js libraries.",
-      icon: "fab fa-github",
-      category: "Development"
-    });
-    this.activities.set(2, {
-      id: 2,
-      title: "Tech Community Speaker",
-      description: "Regular speaker at tech meetups and conferences about modern web development.",
-      icon: "fas fa-microphone",
-      category: "Community"
-    });
-
-    // Initialize sample articles
-    this.articles.set(1, {
-      id: 1,
-      title: "Building Modern React Applications",
-      excerpt: "Learn how to build scalable and maintainable React applications using modern best practices.",
-      content: "React has evolved significantly over the years. In this article, we'll explore the latest patterns and practices for building modern React applications...",
-      category: "Web Development",
-      image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400",
-      date: "2024-01-15",
-      published: true
-    });
-    this.articles.set(2, {
-      id: 2,
-      title: "Node.js Performance Optimization",
-      excerpt: "Tips and techniques to optimize your Node.js applications for better performance.",
-      content: "Performance is crucial for any web application. Here are some proven techniques to optimize your Node.js applications...",
-      category: "Backend Development",
-      image: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400",
-      date: "2024-01-10",
-      published: true
-    });
-
-    // Initialize default social links
-    this.socialLinks.set(1, { id: 1, platform: "GitHub", url: "https://github.com/johndeveloper", icon: "fab fa-github" });
-    this.socialLinks.set(2, { id: 2, platform: "LinkedIn", url: "https://linkedin.com/in/johndeveloper", icon: "fab fa-linkedin" });
-    this.socialLinks.set(3, { id: 3, platform: "Twitter", url: "https://twitter.com/johndeveloper", icon: "fab fa-twitter" });
-
-    // Initialize default services
-    this.services.set(1, { id: 1, name: "Website Development", price: "Rp 25.000.000+", description: "Custom website development with modern technologies" });
-    this.services.set(2, { id: 2, name: "Web Application", price: "Rp 50.000.000+", description: "Full-stack web applications with database integration" });
-    this.services.set(3, { id: 3, name: "UI/UX Design", price: "Rp 15.000.000+", description: "Modern UI/UX design services" });
-    this.services.set(4, { id: 4, name: "Consultation", price: "Rp 500.000/jam", description: "Technical consultation and code review" });
-
-    this.currentId = 20;
-  }
-
-  // User methods
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
-  }
-
-  // Biodata methods
-  async getBiodata(): Promise<Biodata | undefined> {
-    return Array.from(this.biodata.values())[0];
-  }
-
-  async updateBiodata(data: InsertBiodata): Promise<Biodata> {
-    const existing = Array.from(this.biodata.values())[0];
-    const id = existing?.id || this.currentId++;
-    const biodata: Biodata = { ...data, id };
-    this.biodata.set(id, biodata);
-    return biodata;
-  }
-
-  // Skills methods
-  async getSkills(): Promise<Skill[]> {
-    return Array.from(this.skills.values());
-  }
-
-  async getSkill(id: number): Promise<Skill | undefined> {
-    return this.skills.get(id);
-  }
-
-  async createSkill(skill: InsertSkill): Promise<Skill> {
-    const id = this.currentId++;
-    const newSkill: Skill = { ...skill, id };
-    this.skills.set(id, newSkill);
-    return newSkill;
-  }
-
-  async updateSkill(id: number, skill: Partial<InsertSkill>): Promise<Skill> {
-    const existing = this.skills.get(id);
-    if (!existing) throw new Error("Skill not found");
-    const updated: Skill = { ...existing, ...skill };
-    this.skills.set(id, updated);
-    return updated;
-  }
-
-  async deleteSkill(id: number): Promise<boolean> {
-    return this.skills.delete(id);
-  }
-
-  // Experience methods
-  async getExperiences(): Promise<Experience[]> {
-    return Array.from(this.experiences.values());
-  }
-
-  async getExperience(id: number): Promise<Experience | undefined> {
-    return this.experiences.get(id);
-  }
-
-  async createExperience(experience: InsertExperience): Promise<Experience> {
-    const id = this.currentId++;
-    const newExperience: Experience = { ...experience, id };
-    this.experiences.set(id, newExperience);
-    return newExperience;
-  }
-
-  async updateExperience(id: number, experience: Partial<InsertExperience>): Promise<Experience> {
-    const existing = this.experiences.get(id);
-    if (!existing) throw new Error("Experience not found");
-    const updated: Experience = { ...existing, ...experience };
-    this.experiences.set(id, updated);
-    return updated;
-  }
-
-  async deleteExperience(id: number): Promise<boolean> {
-    return this.experiences.delete(id);
-  }
-
-  // Education methods
-  async getEducation(): Promise<Education[]> {
-    return Array.from(this.education.values());
-  }
-
-  async getEducationItem(id: number): Promise<Education | undefined> {
-    return this.education.get(id);
-  }
-
-  async createEducation(education: InsertEducation): Promise<Education> {
-    const id = this.currentId++;
-    const newEducation: Education = { ...education, id };
-    this.education.set(id, newEducation);
-    return newEducation;
-  }
-
-  async updateEducation(id: number, education: Partial<InsertEducation>): Promise<Education> {
-    const existing = this.education.get(id);
-    if (!existing) throw new Error("Education not found");
-    const updated: Education = { ...existing, ...education };
-    this.education.set(id, updated);
-    return updated;
-  }
-
-  async deleteEducation(id: number): Promise<boolean> {
-    return this.education.delete(id);
-  }
-
-  // Activities methods
-  async getActivities(): Promise<Activity[]> {
-    return Array.from(this.activities.values());
-  }
-
-  async getActivity(id: number): Promise<Activity | undefined> {
-    return this.activities.get(id);
-  }
-
-  async createActivity(activity: InsertActivity): Promise<Activity> {
-    const id = this.currentId++;
-    const newActivity: Activity = { ...activity, id };
-    this.activities.set(id, newActivity);
-    return newActivity;
-  }
-
-  async updateActivity(id: number, activity: Partial<InsertActivity>): Promise<Activity> {
-    const existing = this.activities.get(id);
-    if (!existing) throw new Error("Activity not found");
-    const updated: Activity = { ...existing, ...activity };
-    this.activities.set(id, updated);
-    return updated;
-  }
-
-  async deleteActivity(id: number): Promise<boolean> {
-    return this.activities.delete(id);
-  }
-
-  // Articles methods
-  async getArticles(): Promise<Article[]> {
-    return Array.from(this.articles.values());
-  }
-
-  async getPublishedArticles(): Promise<Article[]> {
-    return Array.from(this.articles.values()).filter(article => article.published);
-  }
-
-  async getArticle(id: number): Promise<Article | undefined> {
-    return this.articles.get(id);
-  }
-
-  async createArticle(article: InsertArticle): Promise<Article> {
-    const id = this.currentId++;
-    const newArticle: Article = { ...article, id };
-    this.articles.set(id, newArticle);
-    return newArticle;
-  }
-
-  async updateArticle(id: number, article: Partial<InsertArticle>): Promise<Article> {
-    const existing = this.articles.get(id);
-    if (!existing) throw new Error("Article not found");
-    const updated: Article = { ...existing, ...article };
-    this.articles.set(id, updated);
-    return updated;
-  }
-
-  async deleteArticle(id: number): Promise<boolean> {
-    return this.articles.delete(id);
-  }
-
-  // Contact messages methods
-  async getContactMessages(): Promise<ContactMessage[]> {
-    return Array.from(this.contactMessages.values());
-  }
-
-  async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
-    const id = this.currentId++;
-    const newMessage: ContactMessage = { 
-      ...message, 
-      id, 
-      date: new Date().toLocaleDateString(),
-      read: false 
-    };
-    this.contactMessages.set(id, newMessage);
-    return newMessage;
-  }
-
-  async markMessageAsRead(id: number): Promise<boolean> {
-    const message = this.contactMessages.get(id);
-    if (!message) return false;
-    message.read = true;
-    this.contactMessages.set(id, message);
-    return true;
-  }
-
-  async deleteContactMessage(id: number): Promise<boolean> {
-    return this.contactMessages.delete(id);
-  }
-
-  // Social links methods
-  async getSocialLinks(): Promise<SocialLink[]> {
-    return Array.from(this.socialLinks.values());
-  }
-
-  async createSocialLink(link: InsertSocialLink): Promise<SocialLink> {
-    const id = this.currentId++;
-    const newLink: SocialLink = { ...link, id };
-    this.socialLinks.set(id, newLink);
-    return newLink;
-  }
-
-  async updateSocialLink(id: number, link: Partial<InsertSocialLink>): Promise<SocialLink> {
-    const existing = this.socialLinks.get(id);
-    if (!existing) throw new Error("Social link not found");
-    const updated: SocialLink = { ...existing, ...link };
-    this.socialLinks.set(id, updated);
-    return updated;
-  }
-
-  async deleteSocialLink(id: number): Promise<boolean> {
-    return this.socialLinks.delete(id);
-  }
-
-  // Services methods
-  async getServices(): Promise<Service[]> {
-    return Array.from(this.services.values());
-  }
-
-  async createService(service: InsertService): Promise<Service> {
-    const id = this.currentId++;
-    const newService: Service = { ...service, id };
-    this.services.set(id, newService);
-    return newService;
-  }
-
-  async updateService(id: number, service: Partial<InsertService>): Promise<Service> {
-    const existing = this.services.get(id);
-    if (!existing) throw new Error("Service not found");
-    const updated: Service = { ...existing, ...service };
-    this.services.set(id, updated);
-    return updated;
-  }
-
-  async deleteService(id: number): Promise<boolean> {
-    return this.services.delete(id);
+// BIODATA CRUD
+export async function getBiodata() {
+  const result = await drizzleDb.select().from(schema.biodata);
+  return result[0];
+}
+export async function updateBiodata(data: schema.InsertBiodata) {
+  const existing = await getBiodata();
+  if (existing) {
+    await drizzleDb.update(schema.biodata).set(data).where(eq(schema.biodata.id, existing.id));
+    return { ...existing, ...data };
+  } else {
+    const result = await drizzleDb.insert(schema.biodata).values(data).returning();
+    return result[0];
   }
 }
 
-export const storage = new MemStorage();
+// SKILLS CRUD
+export async function getSkills() {
+  return await drizzleDb.select().from(schema.skills);
+}
+export async function getSkill(id: number) {
+  const result = await drizzleDb.select().from(schema.skills).where(eq(schema.skills.id, id));
+  return result[0];
+}
+export async function createSkill(skill: schema.InsertSkill) {
+  const result = await drizzleDb.insert(schema.skills).values(skill).returning();
+  return result[0];
+}
+export async function updateSkill(id: number, skill: Partial<schema.InsertSkill>) {
+  await drizzleDb.update(schema.skills).set(skill).where(eq(schema.skills.id, id));
+  return getSkill(id);
+}
+export async function deleteSkill(id: number) {
+  await drizzleDb.delete(schema.skills).where(eq(schema.skills.id, id));
+  return true;
+}
+
+// EXPERIENCES CRUD
+export async function getExperiences() {
+  return await drizzleDb.select().from(schema.experiences);
+}
+export async function getExperience(id: number) {
+  const result = await drizzleDb.select().from(schema.experiences).where(eq(schema.experiences.id, id));
+  return result[0];
+}
+export async function createExperience(experience: schema.InsertExperience) {
+  const result = await drizzleDb.insert(schema.experiences).values(experience).returning();
+  return result[0];
+}
+export async function updateExperience(id: number, experience: Partial<schema.InsertExperience>) {
+  await drizzleDb.update(schema.experiences).set(experience).where(eq(schema.experiences.id, id));
+  return getExperience(id);
+}
+export async function deleteExperience(id: number) {
+  await drizzleDb.delete(schema.experiences).where(eq(schema.experiences.id, id));
+  return true;
+}
+
+// EDUCATION CRUD
+export async function getEducation() {
+  return await drizzleDb.select().from(schema.education);
+}
+export async function getEducationItem(id: number) {
+  const result = await drizzleDb.select().from(schema.education).where(eq(schema.education.id, id));
+  return result[0];
+}
+export async function createEducation(education: schema.InsertEducation) {
+  const result = await drizzleDb.insert(schema.education).values(education).returning();
+  return result[0];
+}
+export async function updateEducation(id: number, education: Partial<schema.InsertEducation>) {
+  await drizzleDb.update(schema.education).set(education).where(eq(schema.education.id, id));
+  return getEducationItem(id);
+}
+export async function deleteEducation(id: number) {
+  await drizzleDb.delete(schema.education).where(eq(schema.education.id, id));
+  return true;
+}
+
+// ACTIVITIES CRUD
+export async function getActivities() {
+  return await drizzleDb.select().from(schema.activities);
+}
+export async function getActivity(id: number) {
+  const result = await drizzleDb.select().from(schema.activities).where(eq(schema.activities.id, id));
+  return result[0];
+}
+export async function createActivity(activity: schema.InsertActivity) {
+  const result = await drizzleDb.insert(schema.activities).values(activity).returning();
+  return result[0];
+}
+export async function updateActivity(id: number, activity: Partial<schema.InsertActivity>) {
+  await drizzleDb.update(schema.activities).set(activity).where(eq(schema.activities.id, id));
+  return getActivity(id);
+}
+export async function deleteActivity(id: number) {
+  await drizzleDb.delete(schema.activities).where(eq(schema.activities.id, id));
+  return true;
+}
+
+// ARTICLES CRUD
+export async function getArticles() {
+  return await drizzleDb.select().from(schema.articles);
+}
+export async function getPublishedArticles() {
+  return await drizzleDb.select().from(schema.articles).where(eq(schema.articles.published, true));
+}
+export async function getArticle(id: number) {
+  const result = await drizzleDb.select().from(schema.articles).where(eq(schema.articles.id, id));
+  return result[0];
+}
+export async function createArticle(article: schema.InsertArticle) {
+  const result = await drizzleDb.insert(schema.articles).values(article).returning();
+  return result[0];
+}
+export async function updateArticle(id: number, article: Partial<schema.InsertArticle>) {
+  await drizzleDb.update(schema.articles).set(article).where(eq(schema.articles.id, id));
+  return getArticle(id);
+}
+export async function deleteArticle(id: number) {
+  await drizzleDb.delete(schema.articles).where(eq(schema.articles.id, id));
+  return true;
+}
+
+// CONTACT MESSAGES CRUD
+export async function getContactMessages() {
+  return await drizzleDb.select().from(schema.contactMessages);
+}
+export async function createContactMessage(message: schema.InsertContactMessage) {
+  const now = new Date().toISOString();
+  const result = await drizzleDb.insert(schema.contactMessages).values({ ...message, date: now, read: false }).returning();
+  return result[0];
+}
+export async function markMessageAsRead(id: number) {
+  await drizzleDb.update(schema.contactMessages).set({ read: true }).where(eq(schema.contactMessages.id, id));
+  return true;
+}
+export async function deleteContactMessage(id: number) {
+  await drizzleDb.delete(schema.contactMessages).where(eq(schema.contactMessages.id, id));
+  return true;
+}
+
+// SOCIAL LINKS CRUD
+export async function getSocialLinks() {
+  return await drizzleDb.select().from(schema.socialLinks);
+}
+export async function createSocialLink(link: schema.InsertSocialLink) {
+  const result = await drizzleDb.insert(schema.socialLinks).values(link).returning();
+  return result[0];
+}
+export async function updateSocialLink(id: number, link: Partial<schema.InsertSocialLink>) {
+  await drizzleDb.update(schema.socialLinks).set(link).where(eq(schema.socialLinks.id, id));
+  return getSocialLink(id);
+}
+export async function getSocialLink(id: number) {
+  const result = await drizzleDb.select().from(schema.socialLinks).where(eq(schema.socialLinks.id, id));
+  return result[0];
+}
+export async function deleteSocialLink(id: number) {
+  await drizzleDb.delete(schema.socialLinks).where(eq(schema.socialLinks.id, id));
+  return true;
+}
+
+// SERVICES CRUD
+export async function getServices() {
+  return await drizzleDb.select().from(schema.services);
+}
+export async function createService(service: schema.InsertService) {
+  const result = await drizzleDb.insert(schema.services).values(service).returning();
+  return result[0];
+}
+export async function updateService(id: number, service: Partial<schema.InsertService>) {
+  await drizzleDb.update(schema.services).set(service).where(eq(schema.services.id, id));
+  return getService(id);
+}
+export async function getService(id: number) {
+  const result = await drizzleDb.select().from(schema.services).where(eq(schema.services.id, id));
+  return result[0];
+}
+export async function deleteService(id: number) {
+  await drizzleDb.delete(schema.services).where(eq(schema.services.id, id));
+  return true;
+}
+
+// PROJECTS CRUD
+export async function getProjects() {
+  return await drizzleDb.select().from(schema.projects);
+}
+export async function createProject(project: schema.InsertProject) {
+  const result = await drizzleDb.insert(schema.projects).values(project).returning();
+  return result[0];
+}
+export async function updateProject(id: number, data: Partial<schema.InsertProject>) {
+  await drizzleDb.update(schema.projects).set(data).where(eq(schema.projects.id, id));
+  return getProject(id);
+}
+export async function deleteProject(id: number) {
+  await drizzleDb.delete(schema.projects).where(eq(schema.projects.id, id));
+  return true;
+}
+export async function getProject(id: number) {
+  const result = await drizzleDb.select().from(schema.projects).where(eq(schema.projects.id, id));
+  return result[0];
+}
+
+// Seed admin user
+async function seedAdmin() {
+  try {
+    const existingAdmin = await getUserByUsername("admin");
+    if (!existingAdmin) {
+      await createUser({
+        username: "admin",
+        password: "admin123"
+      });
+      console.log("Admin user created");
+    }
+  } catch (error) {
+    console.error("Error seeding admin:", error);
+  }
+}
+
+// Initialize database with delay to ensure connection is ready
+setTimeout(() => {
+  seedAdmin();
+}, 1000);

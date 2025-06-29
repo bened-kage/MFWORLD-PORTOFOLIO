@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter, Instagram } from "lucide-react";
 import type { Biodata, SocialLink, Service, InsertContactMessage } from "@shared/schema";
+import ParticleBackground from "@/components/particle-background";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -86,7 +87,8 @@ export default function Contact() {
   };
 
   return (
-    <div id="contact" className="min-h-screen pt-20 py-20">
+    <div id="contact" className="min-h-screen pt-20 py-20 relative overflow-hidden">
+      <ParticleBackground />
       <div className="container mx-auto px-6">
         <h2 className="text-5xl font-bold text-center mb-16 gradient-text">Get In Touch</h2>
         

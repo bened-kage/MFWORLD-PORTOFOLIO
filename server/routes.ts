@@ -1,10 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import * as storage from "./storage";
+import { uploadSingle } from "./upload";
 import { 
   insertBiodataSchema, insertSkillSchema, insertExperienceSchema, insertEducationSchema,
   insertActivitySchema, insertArticleSchema, insertContactMessageSchema, insertSocialLinkSchema,
-  insertServiceSchema
+  insertServiceSchema, insertProjectSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -434,6 +435,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       res.status(500).json({ message: "Failed to delete service" });
+    }
+  });
+
+  // File upload routes
+  app.post("/api/upload/biodata", requireAuth, uploadSingle, async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/${req.file.filename}`;
+      res.json({ imageUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Upload failed" });
+    }
+  });
+
+  app.post("/api/upload/experience", requireAuth, uploadSingle, async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/${req.file.filename}`;
+      res.json({ imageUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Upload failed" });
+    }
+  });
+
+  app.post("/api/upload/activity", requireAuth, uploadSingle, async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/${req.file.filename}`;
+      res.json({ imageUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Upload failed" });
+    }
+  });
+
+  app.post("/api/upload/article", requireAuth, uploadSingle, async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/${req.file.filename}`;
+      res.json({ imageUrl });
+    } catch (error) {
+      res.status(500).json({ message: "Upload failed" });
+    }
+  });
+
+  // Project routes
+  app.get("/api/projects", async (req, res) => {
+    try {
+      const projects = await storage.getProjects();
+      res.json(projects);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch projects" });
+    }
+  });
+
+  app.post("/api/projects", requireAuth, async (req, res) => {
+    try {
+      const validatedData = insertProjectSchema.parse(req.body);
+      const project = await storage.createProject(validatedData);
+      console.log("Project created:", project);
+      res.setHeader("Content-Type", "application/json");
+      res.json(project);
+    } catch (error) {
+      console.error("Project create error:", error);
+      res.status(400).json({ message: "Invalid project data", error: error?.message || error });
+    }
+  });
+
+  app.put("/api/projects/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertProjectSchema.partial().parse(req.body);
+      const project = await storage.updateProject(id, validatedData);
+      res.json(project);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update project" });
+    }
+  });
+
+  app.delete("/api/projects/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteProject(id);
+      if (success) {
+        res.json({ message: "Project deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Project not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete project" });
     }
   });
 

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, serial, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -36,6 +36,7 @@ export const experiences = pgTable("experiences", {
   description: text("description").notNull(),
   startDate: text("start_date").notNull(),
   endDate: text("end_date"),
+  image: text("image"),
 });
 
 export const education = pgTable("education", {
@@ -52,6 +53,7 @@ export const activities = pgTable("activities", {
   description: text("description").notNull(),
   icon: text("icon").notNull(),
   category: text("category").notNull(),
+  image: text("image"),
 });
 
 export const articles = pgTable("articles", {
@@ -88,6 +90,15 @@ export const services = pgTable("services", {
   description: text("description"),
 });
 
+export const projects = pgTable("projects", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  year: text("year").notNull(),
+  link: text("link"),
+  image: text("image"),
+});
+
 // Insert schemas
 export const insertBiodataSchema = createInsertSchema(biodata).omit({ id: true });
 export const insertSkillSchema = createInsertSchema(skills).omit({ id: true });
@@ -98,6 +109,7 @@ export const insertArticleSchema = createInsertSchema(articles).omit({ id: true 
 export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({ id: true, date: true, read: true });
 export const insertSocialLinkSchema = createInsertSchema(socialLinks).omit({ id: true });
 export const insertServiceSchema = createInsertSchema(services).omit({ id: true });
+export const insertProjectSchema = createInsertSchema(projects).omit({ id: true });
 
 // Types
 export type Biodata = typeof biodata.$inferSelect;
@@ -118,6 +130,8 @@ export type SocialLink = typeof socialLinks.$inferSelect;
 export type InsertSocialLink = z.infer<typeof insertSocialLinkSchema>;
 export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = z.infer<typeof insertProjectSchema>;
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

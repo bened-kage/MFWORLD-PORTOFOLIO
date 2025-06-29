@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn } from "lucide-react";
+import ParticleBackground from "@/components/particle-background";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -52,7 +53,8 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen pt-20 flex items-center justify-center">
+    <div className="min-h-screen pt-20 flex items-center justify-center relative overflow-hidden">
+      <ParticleBackground />
       <div className="container mx-auto px-6">
         <div className="max-w-md mx-auto">
           <h2 className="text-5xl font-bold text-center mb-16 gradient-text">Admin Panel</h2>
@@ -94,12 +96,6 @@ export default function AdminLogin() {
                 <LogIn className="ml-2 h-4 w-4" />
               </Button>
             </form>
-            
-            <div className="mt-6 p-4 bg-slate-800 rounded-lg">
-              <h4 className="text-sm font-semibold text-neon-cyan mb-2">Demo Credentials:</h4>
-              <p className="text-sm text-slate-400">Username: <span className="text-white">admin</span></p>
-              <p className="text-sm text-slate-400">Password: <span className="text-white">admin123</span></p>
-            </div>
           </GlassCard>
         </div>
       </div>

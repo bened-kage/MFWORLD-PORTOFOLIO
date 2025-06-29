@@ -32,7 +32,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center">
           <Link href="/">
             <div className="text-2xl font-bold gradient-text cursor-pointer">
-              Portfolio
+              MFWORLD
             </div>
           </Link>
           
