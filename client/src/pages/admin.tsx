@@ -1056,42 +1056,100 @@ export default function Admin() {
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-neon-cyan">Manage Experience</h3>
             </div>
-            
             {/* Experience List */}
             <div className="space-y-4 mb-8">
               {experiences.map((exp) => (
                 <div key={exp.id} className="bg-slate-800 rounded-lg p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h5 className="font-semibold text-lg text-neon-cyan">{exp.position}</h5>
-                      <p className="text-white">{exp.company}</p>
-                      <p className="text-sm text-slate-400">{exp.duration}</p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { resetEditStates(); setEditExperience(exp); setIsEditExperienceModalOpen(true); }}
-                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteExperienceMutation.mutate(exp.id)}
-                        disabled={deleteExperienceMutation.isPending}
-                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-slate-300">{exp.description}</p>
+                  {editExperience && editExperience.id === exp.id ? (
+                    // Inline Edit Form
+                    <form
+                      onSubmit={editExperienceForm.handleSubmit((data) => updateExperienceMutation.mutate(data))}
+                      className="flex flex-col gap-4"
+                    >
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Input {...editExperienceForm.register("position")} placeholder="Position" />
+                        <Input {...editExperienceForm.register("company")} placeholder="Company" />
+                        <Input {...editExperienceForm.register("duration")} placeholder="Duration" />
+                        <Input type="date" {...editExperienceForm.register("startDate")} placeholder="Start Date" />
+                        <Input type="date" {...editExperienceForm.register("endDate")} placeholder="End Date" />
+                        <div className="space-y-2 md:col-span-2">
+                          <FileUpload
+                            endpoint="/api/upload/experience"
+                            onUploadSuccess={(imageUrl) => {
+                              editExperienceForm.setValue("image", imageUrl);
+                              toast({ title: "Image uploaded successfully!" });
+                            }}
+                            onUploadError={(error) => {
+                              toast({ title: "Upload failed", description: error, variant: "destructive" });
+                            }}
+                            label="Upload Company/Project Image"
+                          />
+                          {editExperienceForm.watch("image") && (
+                            <div className="mt-2">
+                              <img
+                                src={editExperienceForm.watch("image") || ""}
+                                alt="Experience"
+                                className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Textarea
+                            rows={3}
+                            {...editExperienceForm.register("description")}
+                            placeholder="Description"
+                            className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button type="submit" size="sm" className="bg-green-500 text-white">Save</Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setEditExperience(null); editExperienceForm.reset(); }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  ) : (
+                    // Normal View
+                    <>
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h5 className="font-semibold text-lg text-neon-cyan">{exp.position}</h5>
+                          <p className="text-white">{exp.company}</p>
+                          <p className="text-sm text-slate-400">{exp.duration}</p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => { resetEditStates(); setEditExperience(exp); }}
+                            className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteExperienceMutation.mutate(exp.id)}
+                            disabled={deleteExperienceMutation.isPending}
+                            className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-slate-300">{exp.description}</p>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
-            
             {/* Add Experience Form */}
             <form
               onSubmit={experienceForm.handleSubmit((data) => experienceMutation.mutate(data))}
@@ -1197,44 +1255,78 @@ export default function Admin() {
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-neon-cyan">Manage Education</h3>
             </div>
-            
             {/* Education List */}
             <div className="space-y-4 mb-8">
               {education.map((edu) => (
                 <div key={edu.id} className="bg-slate-800 rounded-lg p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h5 className="font-semibold text-lg text-neon-cyan">{edu.degree}</h5>
-                      <p className="text-white">{edu.institution}</p>
-                      <p className="text-sm text-slate-400">{edu.year}</p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { resetEditStates(); setEditEducation(edu); setIsEditEducationModalOpen(true); }}
-                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteEducationMutation.mutate(edu.id)}
-                        disabled={deleteEducationMutation.isPending}
-                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  {edu.description && (
-                    <p className="text-slate-300">{edu.description}</p>
+                  {editEducation && editEducation.id === edu.id ? (
+                    // Inline Edit Form
+                    <form
+                      onSubmit={editEducationForm.handleSubmit((data) => updateEducationMutation.mutate(data))}
+                      className="flex flex-col gap-4"
+                    >
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Input {...editEducationForm.register("degree")} placeholder="Degree" />
+                        <Input {...editEducationForm.register("institution")} placeholder="Institution" />
+                        <Input {...editEducationForm.register("year")} placeholder="Year" />
+                        <div className="space-y-2 md:col-span-2">
+                          <Textarea
+                            rows={3}
+                            {...editEducationForm.register("description")}
+                            placeholder="Description (Optional)"
+                            className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button type="submit" size="sm" className="bg-green-500 text-white">Save</Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setEditEducation(null); editEducationForm.reset(); }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  ) : (
+                    // Normal View
+                    <>
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h5 className="font-semibold text-lg text-neon-cyan">{edu.degree}</h5>
+                          <p className="text-white">{edu.institution}</p>
+                          <p className="text-sm text-slate-400">{edu.year}</p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => { resetEditStates(); setEditEducation(edu); }}
+                            className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteEducationMutation.mutate(edu.id)}
+                            disabled={deleteEducationMutation.isPending}
+                            className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      {edu.description && (
+                        <p className="text-slate-300">{edu.description}</p>
+                      )}
+                    </>
                   )}
                 </div>
               ))}
             </div>
-            
             {/* Add Education Form */}
             <form
               onSubmit={educationForm.handleSubmit((data) => educationMutation.mutate(data))}
@@ -1303,35 +1395,93 @@ export default function Admin() {
             <div className="space-y-4 mb-8">
               {activities.map((activity) => (
                 <div key={activity.id} className="bg-slate-800 rounded-lg p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center">
-                      <i className={`${activity.icon} text-2xl text-neon-cyan mr-4`}></i>
-                      <div>
-                        <h5 className="font-semibold text-lg">{activity.title}</h5>
-                        <p className="text-sm text-slate-400">{activity.category}</p>
+                  {editActivity && editActivity.id === activity.id ? (
+                    // Inline Edit Form
+                    <form
+                      onSubmit={editActivityForm.handleSubmit((data) => updateActivityMutation.mutate(data))}
+                      className="flex flex-col gap-4"
+                    >
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Input {...editActivityForm.register("title")} placeholder="Title" />
+                        <Input {...editActivityForm.register("category")} placeholder="Category" />
+                        <Input {...editActivityForm.register("icon")} placeholder="Icon Class" />
+                        <div className="space-y-2 md:col-span-2">
+                          <FileUpload
+                            endpoint="/api/upload/activity"
+                            onUploadSuccess={(imageUrl) => {
+                              editActivityForm.setValue("image", imageUrl);
+                              toast({ title: "Image uploaded successfully!" });
+                            }}
+                            onUploadError={(error) => {
+                              toast({ title: "Upload failed", description: error, variant: "destructive" });
+                            }}
+                            label="Upload Activity Image"
+                          />
+                          {editActivityForm.watch("image") && (
+                            <div className="mt-2">
+                              <img
+                                src={editActivityForm.watch("image") || ""}
+                                alt="Activity"
+                                className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Textarea
+                            rows={3}
+                            {...editActivityForm.register("description")}
+                            placeholder="Description"
+                            className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { resetEditStates(); setEditActivity(activity); setIsEditModalOpen(true); }}
-                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteActivityMutation.mutate(activity.id)}
-                        disabled={deleteActivityMutation.isPending}
-                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-slate-300">{activity.description}</p>
+                      <div className="flex gap-2 mt-2">
+                        <Button type="submit" size="sm" className="bg-green-500 text-white">Save</Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setEditActivity(null); editActivityForm.reset(); }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  ) : (
+                    // Normal View
+                    <>
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center">
+                          <i className={`${activity.icon} text-2xl text-neon-cyan mr-4`}></i>
+                          <div>
+                            <h5 className="font-semibold text-lg">{activity.title}</h5>
+                            <p className="text-sm text-slate-400">{activity.category}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => { resetEditStates(); setEditActivity(activity); }}
+                            className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteActivityMutation.mutate(activity.id)}
+                            disabled={deleteActivityMutation.isPending}
+                            className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-slate-300">{activity.description}</p>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -1428,42 +1578,118 @@ export default function Admin() {
             <div className="space-y-4 mb-8">
               {articles.map((article) => (
                 <div key={article.id} className="bg-slate-800 rounded-lg p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex">
-                      <img
-                        src={article.image}
-                        alt={article.title}
-                        className="w-16 h-16 object-cover rounded mr-4"
-                      />
-                      <div>
-                        <h5 className="font-semibold text-lg text-neon-cyan">{article.title}</h5>
-                        <p className="text-sm text-slate-400">{article.category} • {article.date}</p>
-                        <p className="text-sm text-slate-500 mt-1">{article.excerpt}</p>
-                        <span className={`text-xs px-2 py-1 rounded ${article.published ? 'bg-green-600' : 'bg-red-600'} mt-2 inline-block`}>
-                          {article.published ? 'Published' : 'Draft'}
-                        </span>
+                  {editArticle && editArticle.id === article.id ? (
+                    // Inline Edit Form
+                    <form
+                      onSubmit={editArticleForm.handleSubmit((data) => updateArticleMutation.mutate(data))}
+                      className="flex flex-col gap-4"
+                    >
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Input {...editArticleForm.register("title")} placeholder="Title" />
+                        <Input {...editArticleForm.register("category")} placeholder="Category" />
+                        <Input type="date" {...editArticleForm.register("date")} placeholder="Date" />
+                        <div className="space-y-2 md:col-span-2">
+                          <FileUpload
+                            endpoint="/api/upload/article"
+                            onUploadSuccess={(imageUrl) => {
+                              editArticleForm.setValue("image", imageUrl);
+                              toast({ title: "Image uploaded successfully!" });
+                            }}
+                            onUploadError={(error) => {
+                              toast({ title: "Upload failed", description: error, variant: "destructive" });
+                            }}
+                            label="Upload Article Image"
+                          />
+                          {editArticleForm.watch("image") && (
+                            <div className="mt-2">
+                              <img
+                                src={editArticleForm.watch("image") || ""}
+                                alt="Article"
+                                className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Textarea
+                            rows={2}
+                            {...editArticleForm.register("excerpt")}
+                            placeholder="Excerpt"
+                            className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                          />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Textarea
+                            rows={4}
+                            {...editArticleForm.register("content")}
+                            placeholder="Content"
+                            className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                          />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Label className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              {...editArticleForm.register("published")}
+                              className="rounded border-slate-600"
+                            />
+                            <span>Published</span>
+                          </Label>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { resetEditStates(); setEditArticle(article); setIsEditArticleModalOpen(true); }}
-                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteArticleMutation.mutate(article.id)}
-                        disabled={deleteArticleMutation.isPending}
-                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button type="submit" size="sm" className="bg-green-500 text-white">Save</Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setEditArticle(null); editArticleForm.reset(); }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  ) : (
+                    // Normal View
+                    <>
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex">
+                          <img
+                            src={article.image}
+                            alt={article.title}
+                            className="w-16 h-16 object-cover rounded mr-4"
+                          />
+                          <div>
+                            <h5 className="font-semibold text-lg text-neon-cyan">{article.title}</h5>
+                            <p className="text-sm text-slate-400">{article.category} • {article.date}</p>
+                            <p className="text-sm text-slate-500 mt-1">{article.excerpt}</p>
+                            <span className={`text-xs px-2 py-1 rounded ${article.published ? 'bg-green-600' : 'bg-red-600'} mt-2 inline-block`}>
+                              {article.published ? 'Published' : 'Draft'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => { resetEditStates(); setEditArticle(article); }}
+                            className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteArticleMutation.mutate(article.id)}
+                            disabled={deleteArticleMutation.isPending}
+                            className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -1722,20 +1948,92 @@ export default function Admin() {
             <div className="space-y-4 mb-8">
               {projects.map((project) => (
                 <div key={project.id} className="bg-slate-800 rounded-lg p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h5 className="font-semibold text-lg text-neon-cyan">{project.title}</h5>
-                      <p className="text-white">{project.year}</p>
-                      {project.link && <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-neon-cyan underline text-sm">{project.link}</a>}
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => { resetEditStates(); setEditProject(project); setIsEditProjectModalOpen(true); }} className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"><Edit className="h-4 w-4" /></Button>
-                      <Button size="sm" variant="outline" onClick={() => deleteProjectMutation.mutate(project.id)} disabled={deleteProjectMutation.isPending} className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"><Trash2 className="h-4 w-4" /></Button>
-                    </div>
-
-                  </div>
-                  {project.image && <img src={project.image} alt={project.title} className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600 mb-2" />}
-                  <p className="text-slate-300">{project.description}</p>
+                  {editProject && editProject.id === project.id ? (
+                    // Inline Edit Form
+                    <form
+                      onSubmit={editProjectForm.handleSubmit((data) => updateProjectMutation.mutate(data))}
+                      className="flex flex-col gap-4"
+                    >
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Input {...editProjectForm.register("title")} placeholder="Title" />
+                        <Input {...editProjectForm.register("year")} placeholder="Year" />
+                        <Input {...editProjectForm.register("link")} placeholder="Link (optional)" />
+                        <div className="space-y-2 md:col-span-2">
+                          <FileUpload
+                            endpoint="/api/upload/activity"
+                            onUploadSuccess={(imageUrl) => {
+                              editProjectForm.setValue("image", imageUrl);
+                              toast({ title: "Image uploaded successfully!" });
+                            }}
+                            onUploadError={(error) => {
+                              toast({ title: "Upload failed", description: error, variant: "destructive" });
+                            }}
+                            label="Upload Project Image"
+                          />
+                          {editProjectForm.watch("image") && (
+                            <div className="mt-2">
+                              <img
+                                src={editProjectForm.watch("image") || ""}
+                                alt="Project"
+                                className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Textarea
+                            rows={3}
+                            {...editProjectForm.register("description")}
+                            placeholder="Description"
+                            className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan resize-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button type="submit" size="sm" className="bg-green-500 text-white">Save</Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => { setEditProject(null); editProjectForm.reset(); }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  ) : (
+                    // Normal View
+                    <>
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h5 className="font-semibold text-lg text-neon-cyan">{project.title}</h5>
+                          <p className="text-white">{project.year}</p>
+                          {project.link && <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-neon-cyan underline text-sm">{project.link}</a>}
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => { resetEditStates(); setEditProject(project); }}
+                            className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteProjectMutation.mutate(project.id)}
+                            disabled={deleteProjectMutation.isPending}
+                            className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      {project.image && <img src={project.image} alt={project.title} className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600 mb-2" />}
+                      <p className="text-slate-300">{project.description}</p>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -1816,41 +2114,69 @@ export default function Admin() {
               {socialLinks.length > 0 ? (
                 socialLinks.map((link) => (
                   <div key={link.id} className="flex items-center justify-between bg-slate-800 rounded-lg p-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
-                        <i className={`${link.icon} text-xl text-neon-cyan`}></i>
-                      </div>
-                      <div>
-                        <h5 className="font-semibold text-lg text-neon-cyan">{link.platform}</h5>
-                        <a 
-                          href={link.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="text-neon-cyan underline text-sm hover:text-neon-green transition-colors"
-                        >
-                          {link.url}
-                        </a>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { resetEditStates(); setEditSocialLink(link); setIsEditSocialLinkModalOpen(true); }}
-                        className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
+                    {editSocialLink && editSocialLink.id === link.id ? (
+                      // Inline Edit Form
+                      <form
+                        onSubmit={editSocialLinkForm.handleSubmit((data) => updateSocialLinkMutation.mutate(data))}
+                        className="flex-1 flex flex-col md:flex-row md:items-center gap-4"
                       >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteSocialLinkMutation.mutate(link.id)}
-                        disabled={deleteSocialLinkMutation.isPending}
-                        className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                          <Input {...editSocialLinkForm.register("platform")} placeholder="Platform" />
+                          <Input {...editSocialLinkForm.register("url")} placeholder="URL" />
+                          <Input {...editSocialLinkForm.register("icon")} placeholder="Icon Class" />
+                        </div>
+                        <div className="flex gap-2 mt-2 md:mt-0">
+                          <Button type="submit" size="sm" className="bg-green-500 text-white">Save</Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => { setEditSocialLink(null); editSocialLinkForm.reset(); }}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </form>
+                    ) : (
+                      // Normal View
+                      <>
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
+                            <i className={`${link.icon} text-xl text-neon-cyan`}></i>
+                          </div>
+                          <div>
+                            <h5 className="font-semibold text-lg text-neon-cyan">{link.platform}</h5>
+                            <a 
+                              href={link.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-neon-cyan underline text-sm hover:text-neon-green transition-colors"
+                            >
+                              {link.url}
+                            </a>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => { resetEditStates(); setEditSocialLink(link); }}
+                            className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteSocialLinkMutation.mutate(link.id)}
+                            disabled={deleteSocialLinkMutation.isPending}
+                            className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))
               ) : (
