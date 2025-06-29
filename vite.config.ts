@@ -32,4 +32,15 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
+  optimizeDeps: {
+    include: [
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-portal",
+      "@radix-ui/react-overlay",
+      "@radix-ui/react-dismissable-layer",
+      "@radix-ui/react-focus-scope",
+      "@radix-ui/react-id",
+      "@radix-ui/react-primitive"
+    ]
+  }
 });
