@@ -924,6 +924,7 @@ export default function Admin() {
                       size="sm"
                       variant="outline"
                       onClick={() => {
+                        console.log("Edit skill clicked", skill);
                         setEditSkill(skill);
                         setIsEditSkillModalOpen(true);
                       }}
@@ -1035,6 +1036,7 @@ export default function Admin() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
+                          console.log("Edit experience clicked", exp);
                           setEditExperience(exp);
                           setIsEditExperienceModalOpen(true);
                         }}
@@ -1179,6 +1181,7 @@ export default function Admin() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
+                          console.log("Edit education clicked", edu);
                           setEditEducation(edu);
                           setIsEditEducationModalOpen(true);
                         }}
@@ -1285,6 +1288,7 @@ export default function Admin() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
+                          console.log("Edit activity clicked", activity);
                           setEditActivity(activity);
                           setIsEditModalOpen(true);
                         }}
@@ -1421,6 +1425,7 @@ export default function Admin() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
+                          console.log("Edit article clicked", article);
                           setEditArticle(article);
                           setIsEditArticleModalOpen(true);
                         }}
@@ -1704,7 +1709,11 @@ export default function Admin() {
                       {project.link && <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-neon-cyan underline text-sm">{project.link}</a>}
                     </div>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => { setEditProject(project); setIsEditProjectModalOpen(true); }} className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"><Edit className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="outline" onClick={() => {
+                        console.log("Edit project clicked", project);
+                        setEditProject(project);
+                        setIsEditProjectModalOpen(true);
+                      }} className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-slate-900"><Edit className="h-4 w-4" /></Button>
                       <Button size="sm" variant="outline" onClick={() => deleteProjectMutation.mutate(project.id)} disabled={deleteProjectMutation.isPending} className="text-red-400 border-red-400 hover:bg-red-400 hover:text-slate-900"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
@@ -1811,6 +1820,7 @@ export default function Admin() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
+                          console.log("Edit social link clicked", link);
                           setEditSocialLink(link);
                           setIsEditSocialLinkModalOpen(true);
                         }}
