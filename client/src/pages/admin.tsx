@@ -1891,47 +1891,48 @@ export default function Admin() {
 
             {/* Edit Social Link Modal */}
             {isEditSocialLinkModalOpen && (
-              <Dialog open={isEditSocialLinkModalOpen} onOpenChange={setIsEditSocialLinkModalOpen}>
-                <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-                  <div className="bg-slate-900 rounded-xl p-8 w-full max-w-lg">
-                    <h3 className="text-xl font-bold mb-4 text-neon-cyan">Edit Social Link</h3>
-                    <form onSubmit={editSocialLinkForm.handleSubmit((data) => updateSocialLinkMutation.mutate(data))} className="space-y-4">
-                      <div>
-                        <Label htmlFor="editPlatform">Platform</Label>
-                        <Input 
-                          id="editPlatform" 
-                          className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
-                          {...editSocialLinkForm.register("platform")} 
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="editUrl">URL</Label>
-                        <Input 
-                          id="editUrl" 
-                          className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
-                          {...editSocialLinkForm.register("url")} 
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="editIcon">Icon Class</Label>
-                        <Input 
-                          id="editIcon" 
-                          className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
-                          {...editSocialLinkForm.register("icon")} 
-                        />
-                      </div>
-                      <div className="flex justify-end gap-2 mt-4">
-                        <Button type="button" variant="outline" onClick={() => setIsEditSocialLinkModalOpen(false)}>
-                          Cancel
-                        </Button>
-                        <Button type="submit" disabled={updateSocialLinkMutation.isPending}>
-                          {updateSocialLinkMutation.isPending ? "Saving..." : "Save Changes"}
-                        </Button>
-                      </div>
-                    </form>
-                  </div>
+              <div style={{
+                position: "fixed", left: 0, top: 0, width: "100vw", height: "100vh",
+                background: "rgba(0,0,0,0.7)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center"
+              }}>
+                <div style={{ background: "#222", color: "#fff", padding: 32, borderRadius: 8 }}>
+                  <h2>Edit Social Link</h2>
+                  <form onSubmit={editSocialLinkForm.handleSubmit((data) => updateSocialLinkMutation.mutate(data))} className="space-y-4">
+                    <div>
+                      <Label htmlFor="editPlatform">Platform</Label>
+                      <Input 
+                        id="editPlatform" 
+                        className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
+                        {...editSocialLinkForm.register("platform")} 
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="editUrl">URL</Label>
+                      <Input 
+                        id="editUrl" 
+                        className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
+                        {...editSocialLinkForm.register("url")} 
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="editIcon">Icon Class</Label>
+                      <Input 
+                        id="editIcon" 
+                        className="bg-transparent border-2 border-slate-600 focus:border-neon-cyan" 
+                        {...editSocialLinkForm.register("icon")} 
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2 mt-4">
+                      <Button type="button" variant="outline" onClick={() => setIsEditSocialLinkModalOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" disabled={updateSocialLinkMutation.isPending}>
+                        {updateSocialLinkMutation.isPending ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </div>
+                  </form>
                 </div>
-              </Dialog>
+              </div>
             )}
           </GlassCard>
         )}
