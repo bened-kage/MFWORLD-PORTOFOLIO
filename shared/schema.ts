@@ -8,6 +8,11 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
+export const insertUserSchema = createInsertSchema(users).pick({
+  username: true,
+  password: true,
+});
+
 export const biodata = pgTable("biodata", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -135,8 +140,3 @@ export type InsertProject = z.infer<typeof insertProjectSchema>;
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
-
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
